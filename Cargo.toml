@@ -1,0 +1,10 @@
+[package]
+name = "music-manager"
+version = "0.1.0"
+authors = ["Ryan Blecher <notryanb@gmail.com>"]
+
+[dependencies]
+diesel = { version = "1.3", features = ["postgres"] }
+dotenv = "0.13.0"
+id3 = "0.2.5"
+walkdir = "2"
