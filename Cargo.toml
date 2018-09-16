@@ -1,7 +1,15 @@
 [package]
-name = "music-manager"
+name = "music_manager"
 version = "0.1.0"
 authors = ["Ryan Blecher <notryanb@gmail.com>"]
+
+[[bin]]
+name = "music_manager"
+path = "src/bin/main.rs"
+
+[lib]
+name = "music_manager_lib"
+path = "src/lib.rs"
 
 [dependencies]
 diesel = { version = "1.3", features = ["postgres"] }
