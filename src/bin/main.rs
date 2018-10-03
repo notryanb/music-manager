@@ -101,6 +101,7 @@ fn main() {
 
 }
 
+/// Returns the file path if it's a .mp3 file or None.
 pub fn get_mp3_file_paths(entry: &DirEntry) -> Option<String> {
     match entry.path().extension() {
         Some(ext) => match ext.to_str() {
