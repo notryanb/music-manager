@@ -11,7 +11,7 @@ PostgreSQL table design
 ## id3_tags
 - id [int]: PK
 - version_id [byte or something similar]: FK to `versions` table
-- file_id [int]: FK to file that this tag is associated with
+- file_id [int]: diesFK to file that this tag is associated with
 
 ## frames
 - id [int]: PK
