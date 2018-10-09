@@ -6,33 +6,35 @@ extern crate music_manager_lib;
 extern crate walkdir;
 
 
-#[macro_use]
-extern crate native_windows_gui as nwg;
+// #[macro_use]
+// extern crate native_windows_gui as nwg;
 
-use nwg::{
-    Event,
-    Ui,
-    simple_message,
-    fatal_message,
-    dispatch_events
-};
+// use nwg::{
+//     Event,
+//     Ui,
+//     simple_message,
+//     fatal_message,
+//     dispatch_events
+// };
 
 use self::music_manager_lib::*;
 use self::file::{File, NewFile};
 use self::diesel::prelude::*;
 use diesel::insert_into;
 use walkdir::{DirEntry, WalkDir};
+use id3::{Tag, Version};
+use std::str;
 
-#[derive(Debug, Clone, Hash)]
-pub enum AppId {
-    MainWindow,
-    NameInput,
-    HelloButton,
-    Label(u8),
-    SayHello,
-    MainFont,
-    TextFont,
-}
+// #[derive(Debug, Clone, Hash)]
+// pub enum AppId {
+//     MainWindow,
+//     NameInput,
+//     HelloButton,
+//     Label(u8),
+//     SayHello,
+//     MainFont,
+//     TextFont,
+// }
 
 // use AppId::*;
 
@@ -69,18 +71,35 @@ fn main() {
         .filter_map(|e| e.ok())
         .filter_map(|e| get_mp3_file_paths(&e))
         .for_each(|e| {
-            let new_file = NewFile { path: e };
 
-            insert_into(files)
-                .values(new_file)
-                .execute(&connection);
+            let tag = match Tag::read_from_path(e) {
+                Ok(t) => match t.artist() {
+                    Some(artist) => println!("Artist: {}", artist),
+                    None => println!("Empty Artist")
+                },
+                Err(e) => println!("Invalid Tag")
+            };
+
+            // println!("{:?}", tag.get("TPE1").unwrap().content());
+
+            // match tag.artist() {
+            //     Some(artist) => println!("Artist: {}", artist),
+            //     None => println!("Error"),
+            // }
+            
+
+            // let new_file = NewFile { path: e };
+
+            // insert_into(files)
+            //     .values(new_file)
+            //     .execute(&connection);
         });
 
-    let results = files
-        .load::<File>(&connection)
-        .expect("Error loading files");
+    // let results = files
+    //     .load::<File>(&connection)
+    //     .expect("Error loading files");
 
-    println!("Displaying {} files", results.len());
+    // println!("Displaying {} files", results.len());
 
     // for file in results {
     //     println!("{}", file.path);
