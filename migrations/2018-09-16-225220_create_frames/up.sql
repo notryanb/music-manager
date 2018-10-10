@@ -19,7 +19,6 @@ values ('TYER', 'Year'),
   ('TPE1', 'Artist'),
   ('TIT2', 'Title'),
   ('TLEN', 'Duration'),
-  -- ('TPE1', 'Artist'),
   ('TCON', 'Genre'),
   ('TPOS', 'Disc'),
   ('TRCK', 'Track');
