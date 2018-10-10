@@ -6,8 +6,8 @@ create table frame_types (
 
 create table frames (
   id serial primary key,
-  id3_tag_id integer references id3_tags(id),
-  frame_type_id integer references frame_types(id),
+  id3_tag_id integer not null references id3_tags(id),
+  frame_type_id integer not null references frame_types(id),
   content text not null
 );
 
@@ -19,7 +19,7 @@ values ('TYER', 'Year'),
   ('TPE1', 'Artist'),
   ('TIT2', 'Title'),
   ('TLEN', 'Duration'),
-  ('TPE1', 'Artist'),
+  -- ('TPE1', 'Artist'),
   ('TCON', 'Genre'),
   ('TPOS', 'Disc'),
   ('TRCK', 'Track');

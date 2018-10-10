@@ -16,8 +16,8 @@ table! {
 table! {
     frames (id) {
         id -> Int4,
-        id3_tag_id -> Nullable<Int4>,
-        frame_type_id -> Nullable<Int4>,
+        id3_tag_id -> Int4,
+        frame_type_id -> Int4,
         content -> Text,
     }
 }
@@ -25,8 +25,8 @@ table! {
 table! {
     id3_tags (id) {
         id -> Int4,
-        version_id -> Nullable<Int4>,
-        file_id -> Nullable<Int4>,
+        version_id -> Int4,
+        file_id -> Int4,
     }
 }
 

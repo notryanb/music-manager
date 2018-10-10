@@ -11,6 +11,6 @@ values
 
 create table id3_tags (
   id serial primary key,
-  version_id integer references versions(id),
-  file_id integer references files(id)
+  version_id integer not null references versions(id),
+  file_id integer not null references files(id)
 );

@@ -61,7 +61,7 @@ use id3::{Tag};
 fn main() {
     use music_manager_lib::schema::files::dsl::*;
     use music_manager_lib::schema::id3_tags::dsl::*;
-
+    use music_manager_lib::schema::frames::dsl::*;
 
     let connection = establish_connection();
 
@@ -71,13 +71,15 @@ fn main() {
         .filter_map(|e| e.ok())
         .filter_map(|e| get_mp3_file_paths(&e))
         .for_each(|e| {
-            let tag = match Tag::read_from_path(&e) {
-                Ok(t) => match t.artist() {
-                    Some(artist) => println!("Artist: {}", artist),
-                    None => println!("Empty Artist")
-                },
-                Err(e) => println!("Invalid Tag: {:?}", e)
-            };
+            // let tag = match Tag::read_from_path(&e) {
+            //     Ok(t) => match t.artist() {
+            //         Some(artist) => println!("Artist: {}", artist),
+            //         None => println!("Empty Artist")
+            //     },
+            //     Err(e) => println!("Invalid Tag: {:?}", e)
+            // };
+
+            let tag = Tag::read_from_path(&e);
 
             let new_file = database_models::file::NewFile::new(&e);
 
@@ -88,12 +90,26 @@ fn main() {
 
             let new_tag = database_models::tag::NewTag::new(3, file.id);
 
-            let tag_id = diesel::insert_into(id3_tags)
+            let inserted_tag = diesel::insert_into(id3_tags)
                 .values(&new_tag)
-                .execute(&connection)
+                .get_result::<database_models::tag::Tag>(&connection)
                 .expect("error inserting id3 tag");
 
-            println!("Tag ID: {}", tag_id);      
+            if tag.is_ok() {
+                let safe_tag = tag.unwrap();
+                let artist = safe_tag.artist().map_or(String::new(), |artist| artist.to_string());
+                let title = safe_tag.title().map_or(String::new(), |title| title.to_string());
+                let album = safe_tag.album().map_or(String::new(), |album| album.to_string());
+
+                diesel::insert_into(frames)
+                    .values(&vec![
+                        (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(2), content.eq(artist)),
+                        (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(6), content.eq(title)),
+                        (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(4), content.eq(album)),
+                    ])
+                    .execute(&connection)
+                    .unwrap();
+            }
         });
 
     // let file_count = files.count().get_result(&connection);
@@ -128,7 +144,7 @@ fn main() {
 pub fn get_mp3_file_paths(entry: &DirEntry) -> Option<String> {
     match entry.path().extension() {
         Some(ext) => match ext.to_str() {
-            Some(exxt) if  exxt == "mp3" => {
+            Some(exxt) if exxt == "mp3" => {
                 match entry.path().to_str() {
                     Some(p) => Some(p.to_string()),
                     None => None,
