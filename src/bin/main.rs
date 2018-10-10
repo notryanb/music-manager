@@ -18,12 +18,10 @@ extern crate walkdir;
 // };
 
 use self::music_manager_lib::*;
-use self::file::{File, NewFile};
-use self::diesel::prelude::*;
-use diesel::insert_into;
+
+use diesel::prelude::*;
 use walkdir::{DirEntry, WalkDir};
-use id3::{Tag, Version};
-use std::str;
+use id3::{Tag};
 
 // #[derive(Debug, Clone, Hash)]
 // pub enum AppId {
@@ -62,6 +60,8 @@ use std::str;
 
 fn main() {
     use music_manager_lib::schema::files::dsl::*;
+    use music_manager_lib::schema::id3_tags::dsl::*;
+
 
     let connection = establish_connection();
 
@@ -71,29 +71,33 @@ fn main() {
         .filter_map(|e| e.ok())
         .filter_map(|e| get_mp3_file_paths(&e))
         .for_each(|e| {
-
-            let tag = match Tag::read_from_path(e) {
+            let tag = match Tag::read_from_path(&e) {
                 Ok(t) => match t.artist() {
                     Some(artist) => println!("Artist: {}", artist),
                     None => println!("Empty Artist")
                 },
-                Err(e) => println!("Invalid Tag")
+                Err(e) => println!("Invalid Tag: {:?}", e)
             };
 
-            // println!("{:?}", tag.get("TPE1").unwrap().content());
+            let new_file = database_models::file::NewFile::new(&e);
 
-            // match tag.artist() {
-            //     Some(artist) => println!("Artist: {}", artist),
-            //     None => println!("Error"),
-            // }
-            
+            let file = diesel::insert_into(files)
+                .values(&new_file)
+                .get_result::<database_models::file::File>(&connection)
+                .expect("Error inserting file");
 
-            // let new_file = NewFile { path: e };
+            let new_tag = database_models::tag::NewTag::new(3, file.id);
 
-            // insert_into(files)
-            //     .values(new_file)
-            //     .execute(&connection);
+            let tag_id = diesel::insert_into(id3_tags)
+                .values(&new_tag)
+                .execute(&connection)
+                .expect("error inserting id3 tag");
+
+            println!("Tag ID: {}", tag_id);      
         });
+
+    // let file_count = files.count().get_result(&connection);
+    // println!("FileCount: {:?}", Ok(file_count));
 
     // let results = files
     //     .load::<File>(&connection)

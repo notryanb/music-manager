@@ -10,3 +10,16 @@ create table frames (
   frame_type_id integer references frame_types(id),
   content text not null
 );
+
+insert into frame_types (code, description)
+values ('TYER', 'Year'),
+  ('TPE1', 'Artist'),
+  ('TPE2', 'Album Artist'),
+  ('TALB', 'Album'),
+  ('TPE1', 'Artist'),
+  ('TIT2', 'Title'),
+  ('TLEN', 'Duration'),
+  ('TPE1', 'Artist'),
+  ('TCON', 'Genre'),
+  ('TPOS', 'Disc'),
+  ('TRCK', 'Track');
