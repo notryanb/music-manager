@@ -67,50 +67,56 @@ fn main() {
 
     let music_dir = "E:\\Torrent Finished";
 
-    WalkDir::new(music_dir).into_iter()
-        .filter_map(|e| e.ok())
-        .filter_map(|e| get_mp3_file_paths(&e))
-        .for_each(|e| {
-            // let tag = match Tag::read_from_path(&e) {
-            //     Ok(t) => match t.artist() {
-            //         Some(artist) => println!("Artist: {}", artist),
-            //         None => println!("Empty Artist")
-            //     },
-            //     Err(e) => println!("Invalid Tag: {:?}", e)
-            // };
+    // WalkDir::new(music_dir).into_iter()
+    //     .filter_map(|e| e.ok())
+    //     .filter_map(|e| get_mp3_file_paths(&e))
+    //     .for_each(|e| {
+    //         let tag = Tag::read_from_path(&e);
 
-            let tag = Tag::read_from_path(&e);
+    //         let new_file = models::file::NewFile::new(&e);
 
-            let new_file = database_models::file::NewFile::new(&e);
+    //         let file = diesel::insert_into(files)
+    //             .values(&new_file)
+    //             .get_result::<models::file::File>(&connection)
+    //             .expect("Error inserting file");
 
-            let file = diesel::insert_into(files)
-                .values(&new_file)
-                .get_result::<database_models::file::File>(&connection)
-                .expect("Error inserting file");
+    //         let new_tag = models::tag::NewTag::new(3, file.id);
 
-            let new_tag = database_models::tag::NewTag::new(3, file.id);
+    //         let inserted_tag = diesel::insert_into(id3_tags)
+    //             .values(&new_tag)
+    //             .get_result::<models::tag::Tag>(&connection)
+    //             .expect("error inserting id3 tag");
 
-            let inserted_tag = diesel::insert_into(id3_tags)
-                .values(&new_tag)
-                .get_result::<database_models::tag::Tag>(&connection)
-                .expect("error inserting id3 tag");
+    //         if tag.is_ok() {
+    //             let safe_tag = tag.unwrap();
+    //             let artist = safe_tag.artist().map_or(String::new(), |artist| artist.to_string());
+    //             let title = safe_tag.title().map_or(String::new(), |title| title.to_string());
+    //             let album = safe_tag.album().map_or(String::new(), |album| album.to_string());
 
-            if tag.is_ok() {
-                let safe_tag = tag.unwrap();
-                let artist = safe_tag.artist().map_or(String::new(), |artist| artist.to_string());
-                let title = safe_tag.title().map_or(String::new(), |title| title.to_string());
-                let album = safe_tag.album().map_or(String::new(), |album| album.to_string());
+    //             diesel::insert_into(frames)
+    //                 .values(&vec![
+    //                     (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(2), content.eq(artist)),
+    //                     (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(6), content.eq(title)),
+    //                     (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(4), content.eq(album)),
+    //                 ])
+    //                 .execute(&connection)
+    //                 .unwrap();
+    //         }
+    //     });
 
-                diesel::insert_into(frames)
-                    .values(&vec![
-                        (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(2), content.eq(artist)),
-                        (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(6), content.eq(title)),
-                        (id3_tag_id.eq(&inserted_tag.id), frame_type_id.eq(4), content.eq(album)),
-                    ])
-                    .execute(&connection)
-                    .unwrap();
-            }
-        });
+    let tags_frames = id3_tags.inner_join(frames);
+    let tags_files = tags_frames.inner_join(files).filter(frame_type_id.eq(2));
+
+    let results = tags_files.limit(5).select(content).filter(content.ilike("%matt%")).load::<String>(&connection).unwrap();
+
+    println!("Yo");
+    for res in results.into_iter() {
+        println!("{:?}", res);
+    }
+
+    // let tags_files = id3_tags.inner_join(files).select(id3_tags::id, files::path);
+    // let artist_frame = frames.filter(frame_type_id.eq(2));
+    // let tf_artist = tags_files.inner_join(artist_frame).load(&connection);
 
     // let file_count = files.count().get_result(&connection);
     // println!("FileCount: {:?}", Ok(file_count));
