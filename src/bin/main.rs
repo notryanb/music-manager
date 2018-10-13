@@ -3,8 +3,8 @@
 extern crate diesel;
 extern crate id3;
 extern crate music_manager_lib;
+#[macro_use] extern crate quicli;
 extern crate walkdir;
-
 
 // #[macro_use]
 // extern crate native_windows_gui as nwg;
@@ -22,6 +22,19 @@ use self::music_manager_lib::*;
 use diesel::prelude::*;
 use walkdir::{DirEntry, WalkDir};
 use id3::{Tag};
+use quicli::prelude::*;
+
+main!(|args: Cli, log_level: verbosity| { 
+    info!("Reading .mp3's from directory: {:?}", args.directory);
+
+
+    WalkDir::new(&args.directory).into_iter()
+        .filter_map(|e| e.ok())
+        .filter_map(|e| get_mp3_file_paths(&e))
+        .for_each(|e| {
+            println!("File: {:?}", e);
+        });
+});
 
 // #[derive(Debug, Clone, Hash)]
 // pub enum AppId {
@@ -58,14 +71,14 @@ use id3::{Tag};
 // );
 
 
-fn main() {
-    use music_manager_lib::schema::files::dsl::*;
-    use music_manager_lib::schema::id3_tags::dsl::*;
-    use music_manager_lib::schema::frames::dsl::*;
+// fn main() {
+//     use music_manager_lib::schema::files::dsl::*;
+//     use music_manager_lib::schema::id3_tags::dsl::*;
+//     use music_manager_lib::schema::frames::dsl::*;
 
-    let connection = establish_connection();
+//     let connection = establish_connection();
 
-    let music_dir = "E:\\Torrent Finished";
+//     let music_dir = "E:\\Torrent Finished";
 
     // WalkDir::new(music_dir).into_iter()
     //     .filter_map(|e| e.ok())
@@ -104,15 +117,15 @@ fn main() {
     //         }
     //     });
 
-    let tags_frames = id3_tags.inner_join(frames);
-    let tags_files = tags_frames.inner_join(files).filter(frame_type_id.eq(2));
+    // let tags_frames = id3_tags.inner_join(frames);
+    // let tags_files = tags_frames.inner_join(files).filter(frame_type_id.eq(2));
 
-    let results = tags_files.limit(5).select(content).filter(content.ilike("%matt%")).load::<String>(&connection).unwrap();
+    // let results = tags_files.limit(5).select(content).filter(content.ilike("%matt%")).load::<String>(&connection).unwrap();
 
-    println!("Yo");
-    for res in results.into_iter() {
-        println!("{:?}", res);
-    }
+    // println!("Yo");
+    // for res in results.into_iter() {
+    //     println!("{:?}", res);
+    // }
 
     // let tags_files = id3_tags.inner_join(files).select(id3_tags::id, files::path);
     // let artist_frame = frames.filter(frame_type_id.eq(2));
@@ -144,7 +157,7 @@ fn main() {
 
     // dispatch_events();
 
-}
+// }
 
 /// Returns the file path if it's a .mp3 file or None.
 pub fn get_mp3_file_paths(entry: &DirEntry) -> Option<String> {
@@ -161,4 +174,14 @@ pub fn get_mp3_file_paths(entry: &DirEntry) -> Option<String> {
         }
         None => None,
     }
+}
+
+// Add cool slogan for your app here, e.g.:
+/// Get first n lines of a file
+#[derive(Debug, StructOpt)]
+struct Cli {
+    directory: String,
+    
+    #[structopt(flatten)]
+    verbosity: Verbosity,
 }
