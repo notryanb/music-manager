@@ -28,7 +28,9 @@ mod tests {
     fn creates_new_file_from_str() {
         let path = "some/path.mp3";
         let result = NewFile::new(path);
-        let expected = NewFile { path: path.to_string() };
+        let expected = NewFile {
+            path: path.to_string(),
+        };
         assert_eq!(result, expected);
     }
 }
