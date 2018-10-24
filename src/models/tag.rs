@@ -1,6 +1,7 @@
 use schema::*;
 
 #[derive(Debug, Queryable)]
+#[table_name = "id3_tags"]
 pub struct Tag {
     pub id: i32,
     pub version_id: i32,

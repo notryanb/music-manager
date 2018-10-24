@@ -42,4 +42,10 @@ joinable!(frames -> id3_tags (id3_tag_id));
 joinable!(id3_tags -> files (file_id));
 joinable!(id3_tags -> versions (version_id));
 
-allow_tables_to_appear_in_same_query!(files, frame_types, frames, id3_tags, versions,);
+allow_tables_to_appear_in_same_query!(
+    files,
+    frame_types,
+    frames,
+    id3_tags,
+    versions,
+);

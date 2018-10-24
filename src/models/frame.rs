@@ -1,6 +1,8 @@
+use diesel::prelude::*;
 use schema::*;
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Associations, Identifiable, Queryable)]
+#[belongs_to(Tag, foreign_key = "id3_tag_id")]
 pub struct Frame {
     pub id: i32,
     pub id3_tag_id: i32,
