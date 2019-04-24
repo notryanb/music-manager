@@ -1,0 +1,9 @@
+[package]
+name = "music_manager_cli"
+version = "0.1.0"
+authors = ["Ryan Blecher <notryanb@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+quicli = "0.4"
+structopt = "0.2"
