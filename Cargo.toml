@@ -5,5 +5,5 @@ members = [
 ]
 
 [replace]
-"music_manager:0.0.1" = { path = "music_manager" }
-"music_manager_cli:0.0.1" = { path = "music_manager" }
+"music_manager:0.1.0" = { path = "music_manager" }
+"music_manager_cli:0.1.0" = { path = "music_manager_cli" }

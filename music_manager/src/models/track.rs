@@ -1,7 +1,7 @@
-use models::file::File;
-use models::tag::Tag;
+use crate::models::file::File;
+use crate::models::tag::Tag;
 
-use schema::*;
+use crate::schema::*;
 
 pub struct Track {
     pub file: File,

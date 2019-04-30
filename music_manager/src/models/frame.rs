@@ -1,4 +1,4 @@
-use schema::*;
+use crate::schema::*;
 
 #[derive(Debug, Queryable)]
 pub struct Frame {
