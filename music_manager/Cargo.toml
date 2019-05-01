@@ -12,4 +12,3 @@ path = "src/lib.rs"
 diesel = { version = "1.3", features = ["postgres"] }
 dotenv = "0.13.0"
 id3 = "0.3"
-walkdir = "2"

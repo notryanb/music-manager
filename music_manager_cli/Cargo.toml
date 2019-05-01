@@ -12,3 +12,4 @@ path = "src/main.rs"
 music_manager = { path = "../music_manager" }
 quicli = "0.4"
 structopt = "0.2"
+walkdir = "2"
